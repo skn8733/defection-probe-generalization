@@ -33,6 +33,10 @@ I take MacDiarmid et al.'s exact probing method and apply it to Hughes et al.'s 
 
 Activation-based monitoring is only useful for real-world AI control if it generalizes beyond the lab conditions it was first demonstrated in. This is a direct, low-cost test of that generalization.
 
+## Known Risks / Contingencies
+
+**Model reliability:** Hughes et al.'s own results show that alignment-faking signal is weaker at 8B scale than at 70B or 405B — the 8B model is the cheapest to run but also the least reliably deceptive. Before running any activation work, my first step is to explicitly validate the behavioral compliance gap (monitored vs. unmonitored compliance rates) on the 8B model. If that signal is too weak or inconsistent, I'll pivot to the 70B checkpoint rather than build a probe on top of an unreliable behavioral signal.
+
 ## Repo structure
 
 - [`PROJECT_LOG.md`](./PROJECT_LOG.md) — running log of what I did, what I expected vs. found, and what's next (most recent entry first)
