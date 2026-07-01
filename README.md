@@ -35,7 +35,9 @@ Activation-based monitoring is only useful for real-world AI control if it gener
 
 ## Known Risks / Contingencies
 
-**Model reliability:** Hughes et al.'s own results show that alignment-faking signal is weaker at 8B scale than at 70B or 405B — the 8B model is the cheapest to run but also the least reliably deceptive. Before running any activation work, my first step is to explicitly validate the behavioral compliance gap (monitored vs. unmonitored compliance rates) on the 8B model. If that signal is too weak or inconsistent, I'll pivot to the 70B checkpoint rather than build a probe on top of an unreliable behavioral signal.
+**Model reliability (updated 27 Jun 2026):** Hughes et al.'s own results showed weak/no AF signal at 8B scale — I predicted little to no compliance gap. Initial Test 1 (n=2 prompts) showed the opposite: a clear compliance gap on both prompts, with the `<request_fully_accepted/>` suffix firing on the free-tier phishing prompt. This is a small sample and may reflect the prompt suffix rather than genuine alignment faking reasoning, but it means 8B is not definitively ruled out as a target. Expanding to 15-20 prompts before deciding whether to stay on 8B or pivot to 70B.
+
+**Compute:** 8B at 4-bit quantization fits T4 GPU (6.6/15GB used). 70B will not fit locally — requires Together AI API or rented GPU (RunPod/Hyperbolic). This is now the expected path for Test 2 onward.
 
 ## Repo structure
 
