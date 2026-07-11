@@ -74,10 +74,30 @@ with open("prompts/free_tier_wrapper.jinja2") as f:
     FREE_TIER_WRAPPER = f.read()
 with open("prompts/paid_tier_wrapper.jinja2") as f:
     PAID_TIER_WRAPPER = f.read()
-with open("prompts/harmful_requests.txt") as f:
-    harmful_requests = [line.strip() for line in f if line.strip()]
+
+# Load harmful_requests.txt if it exists and has content; otherwise
+# regenerate the same 20 HarmBench prompts used in Test 1, so this
+# script never silently runs on an empty prompt list.
+harmful_requests = []
+if os.path.exists("prompts/harmful_requests.txt"):
+    with open("prompts/harmful_requests.txt") as f:
+        harmful_requests = [line.strip() for line in f if line.strip()]
+
+if not harmful_requests:
+    print("prompts/harmful_requests.txt missing or empty — regenerating from HarmBench...")
+    from datasets import load_dataset
+    harmbench = load_dataset("walledai/HarmBench", "standard", split="train")
+    harmful_requests = [item["prompt"] for item in harmbench.select(range(20))]
+    os.makedirs("prompts", exist_ok=True)
+    with open("prompts/harmful_requests.txt", "w") as f:
+        f.write("\n".join(harmful_requests))
 
 print(f"Loaded {len(harmful_requests)} prompts")
+if not harmful_requests:
+    raise ValueError(
+        "harmful_requests is still empty after attempting to load from file "
+        "and regenerate from HarmBench. Check dataset access and network connectivity."
+    )
 
 # Generate
 def generate_response(user_request, tier="free"):
